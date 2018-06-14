@@ -1,5 +1,3 @@
-package heap.stark;
-
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,12 +12,13 @@ public class JarTest {
 
     @Test
     public void t() throws IOException {
-        JarFile jarFile = new JarFile("C:\\Users\\WZL\\.m2\\repository\\heap-stark\\yaml-web\\1.0-SNAPSHOT\\yaml-web-1.0-SNAPSHOT.jar");
+        JarFile jarFile = new JarFile("/home/wzl/.m2/repository/heap-stark/yaml-web/1.0-SNAPSHOT/yaml-web-1.0-SNAPSHOT.jar");
         Enumeration<JarEntry> entries = jarFile.entries();
         while (entries.hasMoreElements()) {
             JarEntry jarEntry = entries.nextElement();
             String entryName = jarEntry.getName();
             if (entryName.endsWith(".class")) {
+                System.out.println(entryName);
             }
         }
     }
