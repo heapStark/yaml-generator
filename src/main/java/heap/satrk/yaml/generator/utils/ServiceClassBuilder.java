@@ -81,8 +81,8 @@ public class ServiceClassBuilder {
      */
     private void getClassNameByJar(String jarPath) {
         String[] jarInfo = jarPath.split("!");
-        String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf(S));
-        String packagePath = jarInfo[1].substring(1);
+        String jarFilePath = jarInfo[0].substring(S.equals("\\") ? 1 : 0).replace("/", S);
+        String packagePath = jarInfo[1].substring(1).replace("\\", "/");
         try {
             JarFile jarFile = new JarFile(jarFilePath);
             Enumeration<JarEntry> entrys = jarFile.entries();
@@ -92,7 +92,7 @@ public class ServiceClassBuilder {
                 if (entryName.endsWith(".class")) {
 
                     if (entryName.startsWith(packagePath)) {
-                        entryName = entryName.replace(S, ".").substring(0, entryName.lastIndexOf("."));
+                        entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
                         CLASS_LIST.add(entryName);
                     }
 

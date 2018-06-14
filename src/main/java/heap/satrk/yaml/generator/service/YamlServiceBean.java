@@ -104,7 +104,6 @@ public class YamlServiceBean {
 
         //返回结果的泛型参数
         String name = type.getTypeName();
-        System.out.println(name);
 
         Class c = Class.forName(name);
         classList.add(c);
@@ -204,7 +203,6 @@ public class YamlServiceBean {
         }
         RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
         if (requestBody != null) {
-            System.out.println(parameter.getType().getName());
             classList.add(Class.forName(parameter.getType().getName()));
             String name = parameter.getType().getSimpleName();
             String nameLow = name.substring(0, 1).toLowerCase() + name.substring(1);
