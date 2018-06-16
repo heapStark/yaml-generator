@@ -1,5 +1,6 @@
 package heap.satrk.yaml.generator.service;
 
+import heap.satrk.yaml.generator.config.Config;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
@@ -18,15 +19,17 @@ public class YamlServiceBean {
     private Class c;
     private BufferedWriter bufferedWriter;
     private List<Class> classList;
+    private Config config;
 
     public List<Class> getClassList() {
         return classList;
     }
 
-    public YamlServiceBean(Class c, String path) throws Exception {
+    public YamlServiceBean(Class c, Config config) throws Exception {
         this.c = c;
-        new File(path + File.separator + "service").mkdir();
-        File file = new File(path + File.separator + "service" + File.separator + c.getSimpleName() + ".yaml");
+        this.config = config;
+        new File(config.getResultPath() + File.separator + "service").mkdir();
+        File file = new File(config.getResultPath() + File.separator + "service" + File.separator + c.getSimpleName() + ".yaml");
         if (file.exists()) {
             file.delete();
         }
@@ -56,7 +59,7 @@ public class YamlServiceBean {
         bufferedWriter.write("swagger: \"2.0\"");
         bufferedWriter.newLine();
         writeNewLine("info:");
-        writeNewLine("  title: JCLOUD Renewal API");
+        writeNewLine("  title: JCLOUD "+config.getModuleName()+" API");
         writeNewLine("  description: API related to Renewal");
         RequestMapping basePath = (RequestMapping) c.getAnnotation(RequestMapping.class);
         writeNewLine("basePath: " + basePath.value()[0]);
@@ -109,7 +112,7 @@ public class YamlServiceBean {
         classList.add(c);
 
 
-        String nameUp = name.substring(7, name.length() - 6);
+        String nameUp = c.getSimpleName();
         name = nameUp.substring(0, 1).toLowerCase() + nameUp.substring(1);
 
         writeNewLine("                $ref: \"../model/" + nameUp + ".yaml#/definitions/" + name + "\"");

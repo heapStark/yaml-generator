@@ -1,7 +1,6 @@
 package heap.satrk.yaml.generator;
 
 import heap.satrk.yaml.generator.config.Config;
-import heap.satrk.yaml.generator.utils.YamlServiceUtils;
 import heap.satrk.yaml.generator.utils.YamlUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -20,12 +19,13 @@ public class YamlGenerator extends AbstractMojo {
     private String controllerPackage;
     @Parameter
     private String resultPath;
+    @Parameter
+    private String moduleName;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            Config config = new Config(controllerPackage, resultPath);
-            YamlServiceUtils.genServiceYaml(config);
-            YamlUtils.genModelYaml(config);
+            Config config = new Config(controllerPackage, resultPath, moduleName);
+            YamlUtils.genYaml(config);
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage());
         }

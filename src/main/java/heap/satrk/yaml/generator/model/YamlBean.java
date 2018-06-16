@@ -1,6 +1,8 @@
 package heap.satrk.yaml.generator.model;
 
 
+import heap.satrk.yaml.generator.config.Config;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,14 +13,14 @@ import java.lang.reflect.Type;
 
 public class YamlBean {
     Class c;
-    String path;
+    Config config;
     BufferedWriter bufferedWriter;
 
-    public YamlBean(Class c, String path) throws IOException {
+    public YamlBean(Class c, Config config) throws IOException {
         this.c = c;
-        this.path = path;
-        new File(path + File.separator + "model").mkdir();
-        File file = new File(path + File.separator + "model" + File.separator + c.getSimpleName() + ".yaml");
+        this.config = config;
+        new File(config.getResultPath() + File.separator + "model").mkdir();
+        File file = new File(config.getResultPath() + File.separator + "model" + File.separator + c.getSimpleName() + ".yaml");
         if (file.exists()) {
             file.delete();
         }
@@ -61,7 +63,7 @@ public class YamlBean {
         bufferedWriter.write(name.substring(1));
         bufferedWriter.write(":");
         bufferedWriter.newLine();
-        bufferedWriter.write("    x-jcloud-module: renewal");
+        bufferedWriter.write("    x-jcloud-module: "+config.getModuleName());
         bufferedWriter.newLine();
         bufferedWriter.write(("    title: " + c.getSimpleName()));
         bufferedWriter.newLine();

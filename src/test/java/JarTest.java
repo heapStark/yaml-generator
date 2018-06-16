@@ -11,7 +11,7 @@ import java.util.jar.JarFile;
 public class JarTest {
 
     @Test
-    public void t() throws IOException {
+    public void jarTest() throws IOException {
         JarFile jarFile = new JarFile("/home/wzl/.m2/repository/heap-stark/yaml-web/1.0-SNAPSHOT/yaml-web-1.0-SNAPSHOT.jar");
         Enumeration<JarEntry> entries = jarFile.entries();
         while (entries.hasMoreElements()) {
