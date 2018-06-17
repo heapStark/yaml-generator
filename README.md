@@ -11,7 +11,11 @@
 ``` 
 ## 一个简单的示例工程
 
-[demo](https://github.com/heapStark/yaml-generator-demo)  "示例代码"
+[示例代码](https://github.com/heapStark/yaml-generator-demo)
+##
+步骤
+1.  mvn install -Pdev
+2.  mvn install -Papi-****
 ## todoList & problem
 不支持在yaml文档中输出注释
 解决方案1：定义注释注解,这种方案对代码侵入太高
@@ -29,63 +33,37 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix></classpathPrefix>
-                            <mainClass>com.xx.xx.xx</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>heap-stark</groupId>
-                <artifactId>yaml-generator</artifactId>
-                <version>0.1-SNAPSHOT</version>
-                <configuration>
-                    <controllerPackage>heap.stark.controller.api</controllerPackage>
-                    <resultPath>/home/wzl/Downloads/heap-stark/src/main/resources
-                    </resultPath>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>heap-stark</groupId>
-                        <artifactId>heap-stark-web</artifactId>
-                        <version>1.0-SNAPSHOT</version>
-                        <type>jar</type>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>first</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>yaml</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+             <groupId>heap-stark</groupId>
+             <artifactId>yaml-generator</artifactId>
+             <version>1.0-SNAPSHOT</version>
+             <configuration>
+                 <controllerPackage>service.test</controllerPackage>
+                 <resultPath>/home/wzl/source/demo/linux
+                 </resultPath>
+                 <moduleName>test</moduleName>
+             </configuration>
+             <dependencies>
+                 <dependency>
+                     <groupId>heap-stark</groupId>
+                     <artifactId>yaml-web</artifactId>
+                     <version>1.0-SNAPSHOT</version>
+                 </dependency>
+                 <dependency>
+                     <groupId>heap-stark</groupId>
+                     <artifactId>yaml-web2</artifactId>
+                     <version>1.0-SNAPSHOT</version>
+                 </dependency>
+             </dependencies>
+             <executions>
+                 <execution>
+                     <id>first</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>yaml</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
         </plugins>
     </build>
 ```
