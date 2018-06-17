@@ -10,11 +10,16 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
 
 public class YamlBean {
     Class c;
     Config config;
     BufferedWriter bufferedWriter;
+    Set<Class> newModelClass;
+
+
 
     public YamlBean(Class c, Config config) throws IOException {
         this.c = c;
@@ -27,9 +32,10 @@ public class YamlBean {
         file.createNewFile();
         FileWriter fileWriter = new FileWriter(file);
         bufferedWriter = new BufferedWriter(fileWriter);
+        newModelClass = new HashSet<>();
     }
 
-    public void genYaml() throws Exception {
+    public Set<Class> genYaml() throws Exception {
 
         //写入默认头
         writeDef(bufferedWriter, c);
@@ -42,6 +48,8 @@ public class YamlBean {
 
         bufferedWriter.flush();
         bufferedWriter.close();
+
+        return newModelClass;
 
     }
 
@@ -76,7 +84,7 @@ public class YamlBean {
     }
 
     /**
-     * 当前仅支持 List String Integer Integer Date 以及包内Vo引用
+     * 当前仅支持 List String Integer Integer Date 以及包内引用
      *
      * @param field
      * @throws Exception
@@ -89,8 +97,10 @@ public class YamlBean {
             writeListFiled(field);
         } else if (field.getType().getSimpleName().equals("Date")) {
             writeDateFiled(field);
-        } else  {
+        } else if (config.getModelClassSet().contains(field.getType())){
             writeObjectFiled(field);
+        }else {
+            newModelClass.add(field.getType());
         }
     }
 

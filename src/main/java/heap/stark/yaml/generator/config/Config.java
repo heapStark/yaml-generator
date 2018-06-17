@@ -3,22 +3,23 @@ package heap.stark.yaml.generator.config;
 
 import heap.stark.yaml.generator.utils.ServiceClassBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Config {
     private String controllerPackage;
     private String resultPath;
     private String moduleName;
 
-    private List<Class> serviceList;
-    private List<Class> modelList;
+    private Set<Class> controllerClassSet;
+    private Set<Class> modelClassSet;
 
-    public Config(String controllerPackage, String resultPath,String moduleName) {
+    public Config(String controllerPackage, String resultPath, String moduleName) {
         this.controllerPackage = controllerPackage;
         this.resultPath = resultPath;
         this.moduleName = moduleName;
-        serviceList = new ArrayList<>(new ServiceClassBuilder().getClassByPackageName(controllerPackage)) ;
+        controllerClassSet = new ServiceClassBuilder().getClassByPackageName(controllerPackage);
+        this.modelClassSet = new HashSet<>();
     }
 
     @Override
@@ -27,8 +28,8 @@ public class Config {
                 "controllerPackage='" + controllerPackage + '\'' +
                 ", resultPath='" + resultPath + '\'' +
                 ", moduleName='" + moduleName + '\'' +
-                ", serviceList=" + serviceList +
-                ", modelList=" + modelList +
+                ", controllerClassSet=" + controllerClassSet +
+                ", modelClassList=" + modelClassSet +
                 '}';
     }
 
@@ -56,19 +57,19 @@ public class Config {
         this.moduleName = moduleName;
     }
 
-    public List<Class> getServiceList() {
-        return serviceList;
+    public Set<Class> getControllerClassSet() {
+        return controllerClassSet;
     }
 
-    public void setServiceList(List<Class> serviceList) {
-        this.serviceList = serviceList;
+    public void setControllerClassSet(Set<Class> controllerClassSet) {
+        this.controllerClassSet = controllerClassSet;
     }
 
-    public List<Class> getModelList() {
-        return modelList;
+    public Set<Class> getModelClassSet() {
+        return modelClassSet;
     }
 
-    public void setModelList(List<Class> modelList) {
-        this.modelList = modelList;
+    public void setModelClassSet(Set<Class> modelClassSet) {
+        this.modelClassSet = modelClassSet;
     }
 }

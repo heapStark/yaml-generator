@@ -83,7 +83,7 @@ public class ServiceClassBuilder {
      * @param jarPath jar文件路径
      * @return 类的完整名称
      */
-    private void getClassNameByJar(String jarPath)  {
+    private void getClassNameByJar(String jarPath) {
         String[] jarInfo = jarPath.split("!");
         String jarFilePath = jarInfo[0].substring(S.equals("\\") ? 1 : 0).replace("/", S);
         if (jarFilePath.startsWith("file")) {
@@ -121,7 +121,7 @@ public class ServiceClassBuilder {
      * @param packagePath 包路径
      * @return 类的完整名称
      */
-    private void getClassNameByJars(URL[] urls, String packagePath)  {
+    private void getClassNameByJars(URL[] urls, String packagePath) {
         if (urls != null) {
             for (int i = 0; i < urls.length; i++) {
                 URL url = urls[i];

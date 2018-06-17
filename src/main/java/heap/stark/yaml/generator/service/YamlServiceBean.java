@@ -21,10 +21,6 @@ public class YamlServiceBean {
     private List<Class> classList;
     private Config config;
 
-    public List<Class> getClassList() {
-        return classList;
-    }
-
     public YamlServiceBean(Class c, Config config) throws Exception {
         this.c = c;
         this.config = config;
@@ -51,6 +47,7 @@ public class YamlServiceBean {
         writePathParams(pathVariableList);
         bufferedWriter.flush();
         bufferedWriter.close();
+        config.getModelClassSet().addAll(classList);
 
     }
 
