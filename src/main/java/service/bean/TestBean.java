@@ -1,4 +1,4 @@
-package heap.stark.yaml.generator.bean;
+package service.bean;
 
 import java.util.List;
 

@@ -2,9 +2,9 @@ package service.test;
 
 
 import org.springframework.web.bind.annotation.*;
-import heap.stark.yaml.generator.bean.ServiceTerm;
-import heap.stark.yaml.generator.bean.ServiceTermResult;
-import heap.stark.yaml.generator.result.OpenApiResult;
+import service.bean.ServiceTerm;
+import service.bean.ServiceTermResult;
+import service.result.OpenApiResult;
 
 import java.util.Map;
 
@@ -13,8 +13,8 @@ import java.util.Map;
  * Created by wangzhilei3 on 2018/1/9.
  */
 @RestController
-@RequestMapping(value = "/renewal")
-public class OpenApiServiceTermController3 {
+@RequestMapping(value = "/renewal3")
+public class OpenApiServiceTermController5 {
 
     @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.GET)
     public OpenApiResult<ServiceTermResult> query(@PathVariable("serviceCode") String serviceCode) {

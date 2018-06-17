@@ -21,16 +21,18 @@ public class JarTest {
     @Test
     public void classLoaderTest() {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        String packageName = "heap.stark.yaml.generator";
+        String packageName = "heap.stark.service";
         String packagePath = packageName.replace(".", File.separator);
         URL url = loader.getResource(packagePath);
         LOGGER.info("urls:{}",((URLClassLoader)loader).getURLs());
-        if (File.separator.equals("\\")){
-            Assert.assertTrue(url.getPath().startsWith("/"));
-        } else if (url.getProtocol().equals("jar")){
-            Assert.assertTrue(url.getPath().startsWith("file:"));
-        }else {
+        if (url!=null){
+            if (File.separator.equals("\\")){
+                Assert.assertTrue(url.getPath().startsWith("/"));
+            } else if (url.getProtocol().equals("jar")){
+                Assert.assertTrue(url.getPath().startsWith("file:"));
+            }else {
 
+            }
         }
 
     }

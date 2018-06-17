@@ -1,4 +1,4 @@
-package heap.stark.yaml.generator.result;
+package service.result;
 
 /**
  * yamlgen
