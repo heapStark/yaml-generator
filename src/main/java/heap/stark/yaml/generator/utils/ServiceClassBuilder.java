@@ -1,10 +1,13 @@
-package heap.satrk.yaml.generator.utils;
+package heap.stark.yaml.generator.utils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -15,6 +18,8 @@ import java.util.jar.JarFile;
  * Created by wangzhilei3 on 2018/1/9.
  */
 public class ServiceClassBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceClassBuilder.class);
 
     private final List<String> CLASS_LIST = new ArrayList<>();
     private final String S = File.separator;
@@ -45,6 +50,7 @@ public class ServiceClassBuilder {
             try {
                 classList.add(Class.forName(s));
             } catch (ClassNotFoundException e) {
+                LOGGER.error("class not found, class name:{}", s, e);
             }
         }
         return classList;
@@ -99,8 +105,8 @@ public class ServiceClassBuilder {
 
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            LOGGER.error("error to get jarFile, jarFilePath:{}", jarFilePath, e);
         }
     }
 

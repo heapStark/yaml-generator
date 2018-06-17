@@ -1,6 +1,6 @@
-package heap.satrk.yaml.generator.service;
+package heap.stark.yaml.generator.service;
 
-import heap.satrk.yaml.generator.config.Config;
+import heap.stark.yaml.generator.config.Config;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;

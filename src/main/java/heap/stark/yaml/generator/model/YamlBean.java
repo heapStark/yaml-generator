@@ -1,7 +1,7 @@
-package heap.satrk.yaml.generator.model;
+package heap.stark.yaml.generator.model;
 
 
-import heap.satrk.yaml.generator.config.Config;
+import heap.stark.yaml.generator.config.Config;
 
 import java.io.BufferedWriter;
 import java.io.File;

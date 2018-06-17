@@ -1,9 +1,9 @@
-package heap.satrk.yaml.generator.utils;
+package heap.stark.yaml.generator.utils;
 
 
-import heap.satrk.yaml.generator.config.Config;
-import heap.satrk.yaml.generator.model.YamlBean;
-import heap.satrk.yaml.generator.service.YamlServiceBean;
+import heap.stark.yaml.generator.config.Config;
+import heap.stark.yaml.generator.model.YamlBean;
+import heap.stark.yaml.generator.service.YamlServiceBean;
 
 import java.util.ArrayList;
 import java.util.List;

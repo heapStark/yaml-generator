@@ -1,7 +1,7 @@
-package heap.satrk.yaml.generator.config;
+package heap.stark.yaml.generator.config;
 
 
-import heap.satrk.yaml.generator.utils.ServiceClassBuilder;
+import heap.stark.yaml.generator.utils.ServiceClassBuilder;
 
 import java.util.List;
 
