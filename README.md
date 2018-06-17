@@ -9,6 +9,9 @@
 由于基于包扫描查找controller,mvn仓库中应当首先install对应的工程,
 可以增加一个单独的profile引入插件以及插件依赖
 ``` 
+## 一个简单的示例工程
+
+[id]: https://github.com/heapStark/yaml-generator-demo  "示例代码"
 ## todoList & problem
 不支持在yaml文档中输出注释
 解决方案1：定义注释注解,这种方案对代码侵入太高
