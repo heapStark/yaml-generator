@@ -2,6 +2,7 @@ package heap.stark.yaml.generator.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +68,11 @@ public class ServiceClassBuilder {
                     childFilePath = childFilePath.substring(childFilePath.indexOf(S + "classes") + 9, childFilePath.lastIndexOf("."));
                     childFilePath = childFilePath.replace(S, ".");
                     try {
-                        Controller_CLASS_SET.add(Class.forName(childFilePath));
+                        Class c = Class.forName(childFilePath);
+                        if (c.isAnnotationPresent(RestController.class)) {
+                            Controller_CLASS_SET.add(Class.forName(childFilePath));
+                        }
+
                     } catch (ClassNotFoundException e) {
                         LOGGER.error("exception when scan package", e);
                     }
@@ -101,7 +106,10 @@ public class ServiceClassBuilder {
                     if (entryName.startsWith(packagePath)) {
                         entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
                         try {
-                            Controller_CLASS_SET.add(Class.forName(entryName));
+                            Class c = Class.forName(entryName);
+                            if (c.isAnnotationPresent(RestController.class)){
+                                Controller_CLASS_SET.add(Class.forName(entryName));
+                            }
                         } catch (ClassNotFoundException e) {
                             LOGGER.error("exception when scan package", e);
                         }

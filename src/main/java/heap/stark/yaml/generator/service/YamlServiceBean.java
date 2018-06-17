@@ -25,7 +25,7 @@ public class YamlServiceBean {
     public YamlServiceBean(Class c, Config config) throws Exception {
         this.c = c;
         this.config = config;
-        new File(config.getResultPath() + File.separator + "service").mkdir();
+        new File(config.getResultPath() + File.separator + "service").mkdirs();
         File file = new File(config.getResultPath() + File.separator + "service" + File.separator + c.getSimpleName() + ".yaml");
         if (file.exists()) {
             file.delete();
@@ -52,7 +52,11 @@ public class YamlServiceBean {
 
     }
 
-
+    /**
+     * 写入请求头
+     *
+     * @throws Exception
+     */
     public void writeDef() throws Exception {
         bufferedWriter.write("swagger: \"2.0\"");
         bufferedWriter.newLine();
@@ -72,13 +76,20 @@ public class YamlServiceBean {
     public void writeMethod(Method method) throws Exception {
         RequestMapping requestMapping = (RequestMapping) method.getAnnotation(RequestMapping.class);
         String message = requestMapping.path()[0];
-
         writeNewLine("  \"" + message + "\":");
-        if (requestMapping.method()[0].equals(RequestMethod.GET)) {
+        RequestMethod requestMethod = requestMapping.method()[0];
+        if (requestMethod.equals(RequestMethod.GET)) {
             writeNewLine("    get:");
-        } else {
+        } else if (requestMethod.equals(RequestMethod.POST)){
             writeNewLine("    post:");
+        } else if (requestMethod.equals(RequestMethod.DELETE)){
+            writeNewLine("    delete:");
+        }else if (requestMethod.equals(RequestMethod.PUT)){
+            writeNewLine("    put:");
+        }else if (requestMethod.equals(RequestMethod.PATCH)){
+            writeNewLine("    patch:");
         }
+        //todo operationId命名规则
         String[] strings = message.split(":");
         String action = null;
         if (strings != null && strings.length > 1 && strings[strings.length - 1] != null) {
@@ -108,7 +119,6 @@ public class YamlServiceBean {
 
         Class c = Class.forName(name);
         classList.add(c);
-
 
         String nameUp = c.getSimpleName();
         name = nameUp.substring(0, 1).toLowerCase() + nameUp.substring(1);
@@ -198,7 +208,7 @@ public class YamlServiceBean {
             } else {
                 writeNewLine("        - name: " + name);
                 writeNewLine("          in: query");
-                writeNewLine("          type: " + parameter.getType().getSimpleName().toLowerCase());
+                writeNewLine("          type: " + toLow(parameter.getType().getSimpleName()));
                 writeNewLine("          required: " + required);
             }
         }
@@ -206,7 +216,7 @@ public class YamlServiceBean {
         if (requestBody != null) {
             classList.add(Class.forName(parameter.getType().getName()));
             String name = parameter.getType().getSimpleName();
-            String nameLow = name.substring(0, 1).toLowerCase() + name.substring(1);
+            String nameLow = toLow(name);
             writeNewLine("        - name: " + nameLow);
             writeNewLine("          in: body");
             writeNewLine("          schema:");
@@ -214,9 +224,13 @@ public class YamlServiceBean {
         }
     }
 
-    public void writeNewLine(String message) throws Exception {
+    private void writeNewLine(String message) throws Exception {
         bufferedWriter.write(message);
         bufferedWriter.newLine();
+    }
+
+    private String toLow(String name) {
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
 

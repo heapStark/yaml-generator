@@ -24,7 +24,7 @@ public class YamlBean {
     public YamlBean(Class c, Config config) throws IOException {
         this.c = c;
         this.config = config;
-        new File(config.getResultPath() + File.separator + "model").mkdir();
+        new File(config.getResultPath() + File.separator + "model").mkdirs();
         File file = new File(config.getResultPath() + File.separator + "model" + File.separator + c.getSimpleName() + ".yaml");
         if (file.exists()) {
             file.delete();
@@ -65,26 +65,19 @@ public class YamlBean {
      * @throws Exception
      */
     public void writeDef(BufferedWriter bufferedWriter, Class c) throws Exception {
-        bufferedWriter.write("swagger: \"2.0\"");
-        bufferedWriter.newLine();
-        bufferedWriter.write("definitions:");
-        bufferedWriter.newLine();
+        writeNewLine("swagger: \"2.0\"");
+
+        writeNewLine("definitions:");
+
         bufferedWriter.write("  ");
         String name = c.getSimpleName();
-        bufferedWriter.write(name.substring(0, 1).toLowerCase());
-        bufferedWriter.write(name.substring(1));
-        bufferedWriter.write(":");
-        bufferedWriter.newLine();
-        bufferedWriter.write("    x-jcloud-module: " + config.getModuleName());
-        bufferedWriter.newLine();
-        bufferedWriter.write(("    title: " + c.getSimpleName()));
-        bufferedWriter.newLine();
+        bufferedWriter.write(toLow(name));
+        writeNewLine(":");
+        writeNewLine("    x-jcloud-module: " + config.getModuleName());
+        writeNewLine(("    title: " + c.getSimpleName()));
+        writeNewLine("    type: object");
+        writeNewLine("    properties:");
 
-        bufferedWriter.write("    type: object");
-        bufferedWriter.newLine();
-
-        bufferedWriter.write("    properties:");
-        bufferedWriter.newLine();
     }
 
     /**
@@ -119,18 +112,16 @@ public class YamlBean {
      * @throws Exception
      */
     public void writeBasicFiled(Field field) throws Exception {
-        bufferedWriter.write(("      " + field.getName() + ":"));
-        bufferedWriter.newLine();
+        writeNewLine(("      " + field.getName() + ":"));
         if (field.getType().equals(int.class) || field.getType().equals(Integer.class)) {
-            bufferedWriter.write(("        type: " + "integer"));
+            writeNewLine(("        type: " + "integer"));
         } else if (Objects.equals(String.class, field.getType())) {
-            bufferedWriter.write(("        type: " + "string"));
+            writeNewLine(("        type: " + "string"));
         } else if (field.getType().isPrimitive()) {
-            bufferedWriter.write(("        type: "+field.getType().getSimpleName()));
+            writeNewLine(("        type: " + field.getType().getSimpleName()));
         } else {
-            bufferedWriter.write(("        type: number"));
+            writeNewLine(("        type: number"));
         }
-        bufferedWriter.newLine();
 
     }
 
@@ -143,11 +134,9 @@ public class YamlBean {
     public void writeObjectFiled(Field field) throws Exception {
 
 
-        bufferedWriter.write(("      " + field.getName() + ":"));
-        bufferedWriter.newLine();
+        writeNewLine(("      " + field.getName() + ":"));
         String s = field.getType().getSimpleName();
-        bufferedWriter.write(("        $ref: \"../model/" + s + ".yaml#/definitions/" + field.getName() + "\""));
-        bufferedWriter.newLine();
+        writeNewLine(("        $ref: \"../model/" + s + ".yaml#/definitions/" + field.getName() + "\""));
     }
 
     /**
@@ -157,14 +146,11 @@ public class YamlBean {
      * @throws Exception
      */
     public void writeDateFiled(Field field) throws Exception {
-        bufferedWriter.write(("      " + field.getName() + ":"));
-        bufferedWriter.newLine();
+        writeNewLine(("      " + field.getName() + ":"));
 
-        bufferedWriter.write("        type: string");
-        bufferedWriter.newLine();
+        writeNewLine("        type: string");
 
-        bufferedWriter.write("        format: date-time");
-        bufferedWriter.newLine();
+        writeNewLine("        format: date-time");
     }
 
     /**
@@ -175,14 +161,11 @@ public class YamlBean {
      */
     public void writeListFiled(Field field) throws Exception {
 
-        bufferedWriter.write(("      " + field.getName() + ":"));
-        bufferedWriter.newLine();
+        writeNewLine(("      " + field.getName() + ":"));
 
-        bufferedWriter.write("        type: array");
-        bufferedWriter.newLine();
+        writeNewLine("        type: array");
 
-        bufferedWriter.write("        items:");
-        bufferedWriter.newLine();
+        writeNewLine("        items:");
 
         Type fieldType = field.getGenericType();
         Type type = ((ParameterizedType) fieldType).getActualTypeArguments()[0];
@@ -190,13 +173,20 @@ public class YamlBean {
         String[] strings = name.split("\\.");
         name = strings[strings.length - 1];
         if (name.equals("String") || name.equals("Integer") || name.equals("Long")) {
-            bufferedWriter.write(("          type: " + name.toLowerCase()));
-            bufferedWriter.newLine();
+            writeNewLine(("          type: " + toLow(name)));
         } else {
-            String ss = name.substring(0, 1).toLowerCase() + name.substring(1);
-            bufferedWriter.write((("          $ref: \"../model/" + name + ".yaml#/definitions/" + ss) + "\""));
-            bufferedWriter.newLine();
+            String ss = toLow(name);
+            writeNewLine((("          $ref: \"../model/" + name + ".yaml#/definitions/" + ss) + "\""));
         }
+    }
+
+    private void writeNewLine(String message) throws Exception {
+        bufferedWriter.write(message);
+        bufferedWriter.newLine();
+    }
+
+    private String toLow(String name) {
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
 }

@@ -45,4 +45,26 @@ public class OpenApiServiceTermController5 {
         return null;
     }
 
+    @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.DELETE)
+    public OpenApiResult<ServiceTermResult> delete(@PathVariable("serviceCode") String serviceCode) {
+        return null;
+    }
+
+    @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.PUT)
+    public OpenApiResult<ServiceTermResult> put(@PathVariable("serviceCode") String serviceCode) {
+        return null;
+    }
+
+    @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.PATCH)
+    public OpenApiResult<ServiceTermResult> patch(@PathVariable("serviceCode") String serviceCode) {
+        return null;
+    }
+
+    @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.PATCH)
+    public OpenApiResult<ServiceTerm> test(@PathVariable("serviceCode") String serviceCode) {
+        return null;
+    }
+
+
+
 }
