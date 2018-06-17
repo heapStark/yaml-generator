@@ -31,12 +31,6 @@ public class ServiceClassBuilder {
      * @return 类的完整名称
      */
     public List<Class> getClassByPackageName(String packageName) {
-        try {
-            JarFile jarFile = new JarFile("/home/wzl/.m2/repository/heap-stark/yaml-web/1.0-SNAPSHOT/yaml-web-1.0-SNAPSHOT.jar");
-        } catch (IOException e) {
-            LOGGER.info("-------------error to get jarFile",e);
-        }
-
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         LOGGER.info("ClassLoader :{}", loader);
         String packagePath = packageName.replace(".", S);
@@ -99,9 +93,12 @@ public class ServiceClassBuilder {
     private void getClassNameByJar(String jarPath) {
         String[] jarInfo = jarPath.split("!");
         String jarFilePath = jarInfo[0].substring(S.equals("\\") ? 1 : 0).replace("/", S);
+        if (jarFilePath.startsWith("file")){
+            jarFilePath = jarFilePath.substring(5);
+        }
         String packagePath = jarInfo[1].substring(1).replace("\\", "/");
         try {
-            JarFile jarFile = new JarFile(jarFilePath.substring(5));
+            JarFile jarFile = new JarFile(jarFilePath);
             Enumeration<JarEntry> entrys = jarFile.entries();
             while (entrys.hasMoreElements()) {
                 JarEntry jarEntry = entrys.nextElement();
