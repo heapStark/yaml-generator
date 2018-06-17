@@ -63,7 +63,7 @@ public class YamlBean {
         bufferedWriter.write(name.substring(1));
         bufferedWriter.write(":");
         bufferedWriter.newLine();
-        bufferedWriter.write("    x-jcloud-module: "+config.getModuleName());
+        bufferedWriter.write("    x-jcloud-module: " + config.getModuleName());
         bufferedWriter.newLine();
         bufferedWriter.write(("    title: " + c.getSimpleName()));
         bufferedWriter.newLine();
@@ -85,12 +85,12 @@ public class YamlBean {
         String name = field.getType().getSimpleName();
         if (name.equals("String") || name.equals("Integer") || name.equals("Integer") || name.equals("int") || name.equals("BigDecimal")) {
             writeBasicFiled(field);
-        } else if (field.getType().getPackage().getName().equals("model")) {
-            writeObjectFiled(field);
         } else if (field.getType().getSimpleName().equals("List")) {
             writeListFiled(field);
         } else if (field.getType().getSimpleName().equals("Date")) {
             writeDateFiled(field);
+        } else  {
+            writeObjectFiled(field);
         }
     }
 
