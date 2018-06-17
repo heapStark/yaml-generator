@@ -44,10 +44,10 @@ public class ServiceClassBuilder {
             } else if (type.equals("jar")) {
                 getClassNameByJar(url.getPath());
             }
-        } else {
-            LOGGER.info("urls:{}",((URLClassLoader) loader).getURLs());
-            getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath);
         }
+        LOGGER.info("urls:{}", ((URLClassLoader) loader).getURLs());
+        getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath);
+
 
         List<Class> classList = new ArrayList<Class>();
         for (String s : CLASS_LIST) {
@@ -93,7 +93,7 @@ public class ServiceClassBuilder {
     private void getClassNameByJar(String jarPath) {
         String[] jarInfo = jarPath.split("!");
         String jarFilePath = jarInfo[0].substring(S.equals("\\") ? 1 : 0).replace("/", S);
-        if (jarFilePath.startsWith("file")){
+        if (jarFilePath.startsWith("file")) {
             jarFilePath = jarFilePath.substring(5);
         }
         String packagePath = jarInfo[1].substring(1).replace("\\", "/");
