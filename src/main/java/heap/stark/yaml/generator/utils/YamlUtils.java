@@ -6,7 +6,8 @@ import heap.stark.yaml.generator.model.YamlBean;
 import heap.stark.yaml.generator.service.YamlServiceBean;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * yamlgen
@@ -18,13 +19,13 @@ import java.util.List;
 public class YamlUtils {
 
     public static void genYaml(Config config) throws Exception {
-        List<Class> list = new ArrayList<>();
+        Set<Class> set = new HashSet<>();
         for (Class c : config.getServiceList()) {
             YamlServiceBean yamlServiceBean = new YamlServiceBean(c, config);
             yamlServiceBean.genYaml();
-            list.addAll(yamlServiceBean.getClassList());
+            set.addAll(yamlServiceBean.getClassList());
         }
-        config.setModelList(list);
+        config.setModelList(new ArrayList<>(set));
         for (Class c : config.getModelList()) {
             new YamlBean(c, config).genYaml();
         }

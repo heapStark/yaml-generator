@@ -3,6 +3,7 @@ package heap.stark.yaml.generator.config;
 
 import heap.stark.yaml.generator.utils.ServiceClassBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
@@ -17,7 +18,7 @@ public class Config {
         this.controllerPackage = controllerPackage;
         this.resultPath = resultPath;
         this.moduleName = moduleName;
-        serviceList = new ServiceClassBuilder().getClassByPackageName(controllerPackage);
+        serviceList = new ArrayList<>(new ServiceClassBuilder().getClassByPackageName(controllerPackage)) ;
     }
 
     @Override

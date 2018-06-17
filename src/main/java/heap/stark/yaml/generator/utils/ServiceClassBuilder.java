@@ -7,21 +7,18 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * yamlgen
- * Created by wangzhilei3 on 2018/1/9.
+ *
  */
 public class ServiceClassBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceClassBuilder.class);
 
-    private final List<String> CLASS_LIST = new ArrayList<>();
+    private final Set<Class> Controller_CLASS_SET = new HashSet<>();
     private final String S = File.separator;
 
     /**
@@ -30,7 +27,7 @@ public class ServiceClassBuilder {
      * @param packageName 包名
      * @return 类的完整名称
      */
-    public List<Class> getClassByPackageName(String packageName) {
+    public Set<Class> getClassByPackageName(String packageName) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         LOGGER.info("ClassLoader :{}", loader);
         String packagePath = packageName.replace(".", S);
@@ -49,15 +46,7 @@ public class ServiceClassBuilder {
         getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath);
 
 
-        List<Class> classList = new ArrayList<Class>();
-        for (String s : CLASS_LIST) {
-            try {
-                classList.add(Class.forName(s));
-            } catch (ClassNotFoundException e) {
-                LOGGER.error("class not found, class name:{}", s, e);
-            }
-        }
-        return classList;
+        return Controller_CLASS_SET;
     }
 
     /**
@@ -77,7 +66,11 @@ public class ServiceClassBuilder {
                 if (childFilePath.endsWith(".class")) {
                     childFilePath = childFilePath.substring(childFilePath.indexOf(S + "classes") + 9, childFilePath.lastIndexOf("."));
                     childFilePath = childFilePath.replace(S, ".");
-                    CLASS_LIST.add(childFilePath);
+                    try {
+                        Controller_CLASS_SET.add(Class.forName(childFilePath));
+                    } catch (ClassNotFoundException e) {
+                        LOGGER.error("exception when scan package", e);
+                    }
                 }
             }
         }
@@ -90,7 +83,7 @@ public class ServiceClassBuilder {
      * @param jarPath jar文件路径
      * @return 类的完整名称
      */
-    private void getClassNameByJar(String jarPath) {
+    private void getClassNameByJar(String jarPath)  {
         String[] jarInfo = jarPath.split("!");
         String jarFilePath = jarInfo[0].substring(S.equals("\\") ? 1 : 0).replace("/", S);
         if (jarFilePath.startsWith("file")) {
@@ -107,7 +100,11 @@ public class ServiceClassBuilder {
 
                     if (entryName.startsWith(packagePath)) {
                         entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
-                        CLASS_LIST.add(entryName);
+                        try {
+                            Controller_CLASS_SET.add(Class.forName(entryName));
+                        } catch (ClassNotFoundException e) {
+                            LOGGER.error("exception when scan package", e);
+                        }
                     }
 
                 }
@@ -124,7 +121,7 @@ public class ServiceClassBuilder {
      * @param packagePath 包路径
      * @return 类的完整名称
      */
-    private void getClassNameByJars(URL[] urls, String packagePath) {
+    private void getClassNameByJars(URL[] urls, String packagePath)  {
         if (urls != null) {
             for (int i = 0; i < urls.length; i++) {
                 URL url = urls[i];
