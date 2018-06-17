@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class YamlBean {
@@ -18,7 +19,6 @@ public class YamlBean {
     Config config;
     BufferedWriter bufferedWriter;
     Set<Class> newModelClass;
-
 
 
     public YamlBean(Class c, Config config) throws IOException {
@@ -43,7 +43,11 @@ public class YamlBean {
         //根据变量写入参数
         Field[] fields = c.getDeclaredFields();
         for (Field field : fields) {
-            writeFiled(field);
+            try {
+                writeFiled(field);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         bufferedWriter.flush();
@@ -90,16 +94,20 @@ public class YamlBean {
      * @throws Exception
      */
     public void writeFiled(Field field) throws Exception {
-        String name = field.getType().getSimpleName();
-        if (name.equals("String") || name.equals("Integer") || name.equals("Integer") || name.equals("int") || name.equals("BigDecimal")) {
+        Class fieldClass = field.getType();
+        if (fieldClass.equals(String.class)
+                || fieldClass.isPrimitive()
+                || Objects.equals(fieldClass.getSuperclass(), Number.class)
+                ) {
             writeBasicFiled(field);
         } else if (field.getType().getSimpleName().equals("List")) {
             writeListFiled(field);
         } else if (field.getType().getSimpleName().equals("Date")) {
             writeDateFiled(field);
-        } else if (config.getModelClassSet().contains(field.getType())){
+        } else if (config.getModelClassSet().contains(field.getType())) {
             writeObjectFiled(field);
-        }else {
+        } else {
+            writeObjectFiled(field);
             newModelClass.add(field.getType());
         }
     }
@@ -113,17 +121,16 @@ public class YamlBean {
     public void writeBasicFiled(Field field) throws Exception {
         bufferedWriter.write(("      " + field.getName() + ":"));
         bufferedWriter.newLine();
-        if (field.getType().getSimpleName().equals("int")) {
+        if (field.getType().equals(int.class) || field.getType().equals(Integer.class)) {
             bufferedWriter.write(("        type: " + "integer"));
-            bufferedWriter.newLine();
-        } else if (field.getType().getSimpleName().equals("BigDecimal")) {
+        } else if (Objects.equals(String.class, field.getType())) {
             bufferedWriter.write(("        type: " + "string"));
-            bufferedWriter.newLine();
+        } else if (field.getType().isPrimitive()) {
+            bufferedWriter.write(("        type: "+field.getType().getSimpleName()));
         } else {
-            String s = field.getType().getSimpleName().toLowerCase();
-            bufferedWriter.write(("        type: " + s));
-            bufferedWriter.newLine();
+            bufferedWriter.write(("        type: number"));
         }
+        bufferedWriter.newLine();
 
     }
 

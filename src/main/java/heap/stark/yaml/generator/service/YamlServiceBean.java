@@ -20,6 +20,7 @@ public class YamlServiceBean {
     private BufferedWriter bufferedWriter;
     private List<Class> classList;
     private Config config;
+    private List<PathVariable> pathVariableList;
 
     public YamlServiceBean(Class c, Config config) throws Exception {
         this.c = c;
@@ -33,6 +34,7 @@ public class YamlServiceBean {
         FileWriter fileWriter = new FileWriter(file);
         bufferedWriter = new BufferedWriter(fileWriter);
         classList = new ArrayList<>();
+        pathVariableList = new ArrayList<>();
     }
 
     public void genYaml() throws Exception {
@@ -40,11 +42,10 @@ public class YamlServiceBean {
         writeDef();
         //根据方法写入信息
         Method[] methods = c.getDeclaredMethods();
-        List<PathVariable> pathVariableList = new ArrayList<PathVariable>();
         for (Method method : methods) {
-            writeMethod(method, pathVariableList);
+            writeMethod(method);
         }
-        writePathParams(pathVariableList);
+        writePathParams();
         bufferedWriter.flush();
         bufferedWriter.close();
         config.getModelClassSet().addAll(classList);
@@ -56,8 +57,8 @@ public class YamlServiceBean {
         bufferedWriter.write("swagger: \"2.0\"");
         bufferedWriter.newLine();
         writeNewLine("info:");
-        writeNewLine("  title: JCLOUD "+config.getModuleName()+" API");
-        writeNewLine("  description: API related to Renewal");
+        writeNewLine("  title: JCLOUD " + config.getModuleName() + " API");
+        writeNewLine("  description: API related to " + config.getModuleName());
         RequestMapping basePath = (RequestMapping) c.getAnnotation(RequestMapping.class);
         writeNewLine("basePath: " + basePath.value()[0]);
         writeNewLine("paths:");
@@ -68,7 +69,7 @@ public class YamlServiceBean {
      * @param method
      * @throws Exception
      */
-    public void writeMethod(Method method, List<PathVariable> pathVariableList) throws Exception {
+    public void writeMethod(Method method) throws Exception {
         RequestMapping requestMapping = (RequestMapping) method.getAnnotation(RequestMapping.class);
         String message = requestMapping.path()[0];
 
@@ -139,7 +140,7 @@ public class YamlServiceBean {
         }
     }
 
-    public void writePathParams(List<PathVariable> pathVariableList) throws Exception {
+    public void writePathParams() throws Exception {
         if (pathVariableList == null || pathVariableList.size() == 0) {
             return;
         }
