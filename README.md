@@ -11,7 +11,7 @@
 ``` 
 ## 一个简单的示例工程
 
-[id]: https://github.com/heapStark/yaml-generator-demo  "示例代码"
+[demo](https://github.com/heapStark/yaml-generator-demo)  "示例代码"
 ## todoList & problem
 不支持在yaml文档中输出注释
 解决方案1：定义注释注解,这种方案对代码侵入太高
