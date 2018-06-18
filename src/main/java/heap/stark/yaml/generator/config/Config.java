@@ -2,8 +2,12 @@ package heap.stark.yaml.generator.config;
 
 
 import heap.stark.yaml.generator.utils.ServiceClassBuilder;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 public class Config {
@@ -18,6 +22,22 @@ public class Config {
         this.controllerPackage = controllerPackage;
         this.resultPath = resultPath;
         this.moduleName = moduleName;
+        controllerClassSet = new ServiceClassBuilder().getClassByPackageName(controllerPackage);
+        this.modelClassSet = new HashSet<>();
+    }
+
+    public void initByProperties() throws IOException {
+        InputStream in = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("yaml.properties");
+        Properties pro = new Properties();
+        pro.load(in);
+        if (!StringUtils.isEmpty(pro.getProperty("controllerPackage"))) {
+            controllerPackage = pro.getProperty("controllerPackage");
+        } else if (!StringUtils.isEmpty(pro.getProperty("resultPath"))) {
+            resultPath = pro.getProperty("resultPath");
+        } else if (!StringUtils.isEmpty(pro.getProperty("moduleName"))) {
+            moduleName = pro.getProperty("moduleName");
+        }
         controllerClassSet = new ServiceClassBuilder().getClassByPackageName(controllerPackage);
         this.modelClassSet = new HashSet<>();
     }
