@@ -4,6 +4,7 @@ import heap.stark.yaml.generator.config.Config;
 import org.objectweb.asm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
@@ -43,10 +44,14 @@ public class YamlServiceBean {
         //根据方法写入信息
         Method[] methods = c.getDeclaredMethods();
         for (Method method : methods) {
+            if (method.getAnnotation(RequestMapping.class) == null) {
+                continue;
+            }
             List<String> paramNames = getMethodParameterNamesByAsm4(method);
             LOGGER.info("paramNames for method {},:{}", method.getName(), paramNames);
             writeMethod(method);
         }
+
         writePathParams();
         bufferedWriter.flush();
         bufferedWriter.close();
@@ -76,8 +81,14 @@ public class YamlServiceBean {
      * @throws Exception
      */
     public void writeMethod(Method method) throws Exception {
-        RequestMapping requestMapping = (RequestMapping) method.getAnnotation(RequestMapping.class);
-        String message = requestMapping.path()[0];
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        List<String> pathList = new ArrayList<String>(Arrays.asList(requestMapping.value()));
+        pathList.addAll(Arrays.asList(requestMapping.path()));
+        String message = "/";
+        if (!CollectionUtils.isEmpty(pathList)) {
+            message = pathList.get(0);
+        } else {
+        }
         writeNewLine("  \"" + message + "\":");
         RequestMethod requestMethod = requestMapping.method()[0];
         if (requestMethod.equals(RequestMethod.GET)) {
@@ -90,6 +101,8 @@ public class YamlServiceBean {
             writeNewLine("    put:");
         } else if (requestMethod.equals(RequestMethod.PATCH)) {
             writeNewLine("    patch:");
+        } else {
+            writeNewLine("    get:");
         }
         //todo operationId命名规则
         String[] strings = message.split(":");
@@ -105,6 +118,7 @@ public class YamlServiceBean {
         //写入请求参数
         Parameter[] parameters = method.getParameters();
         List<String> parameterNames = getMethodParameterNamesByAsm4(method);
+        LOGGER.info("parameters in method {}:{}", method, parameters);
         writeParams(parameters, parameterNames);
 
 
@@ -124,7 +138,7 @@ public class YamlServiceBean {
         classList.add(c);
 
         String nameUp = c.getSimpleName();
-        name = nameUp.substring(0, 1).toLowerCase() + nameUp.substring(1);
+        name = toLow(nameUp);
 
         writeNewLine("                $ref: \"../model/" + nameUp + ".yaml#/definitions/" + name + "\"");
         writeNewLine("              requestId:");
@@ -154,7 +168,7 @@ public class YamlServiceBean {
     }
 
     public void writePathParams() throws Exception {
-        if (pathVariableList == null || pathVariableList.size() == 0) {
+        if (CollectionUtils.isEmpty(pathVariableList)) {
             return;
         }
         Set<String> nameSet = new HashSet<String>();
@@ -175,14 +189,18 @@ public class YamlServiceBean {
     }
 
     public void writeParams(Parameter[] parameters, List<String> names) throws Exception {
-        LOGGER.info("parameters:{}", parameters);
+
         if (parameters == null || parameters.length == 0) {
             return;
         } else {
-
+            //todo
             for (Parameter parameter : parameters) {
                 RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
                 RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
+                if (parameter.getAnnotations() == null || parameter.getAnnotations().length == 0) {
+                    writeNewLine("      parameters:");
+                    break;
+                }
                 if (requestParam != null || requestBody != null) {
                     writeNewLine("      parameters:");
                     break;
@@ -225,7 +243,7 @@ public class YamlServiceBean {
             writeNewLine("          in: body");
             writeNewLine("          schema:");
             writeNewLine("            $ref: " + "\"../model/" + name + ".yaml#/definitions/" + nameLow + "\"");
-        } else if (parameter.getAnnotations()==null ||parameter.getAnnotations().length==0){
+        } else if (parameter.getAnnotations() == null || parameter.getAnnotations().length == 0) {
             writeNewLine("        - name: " + string);
             writeNewLine("          in: query");
             writeNewLine("          type: " + toLow(parameter.getType().getSimpleName()));
@@ -242,7 +260,13 @@ public class YamlServiceBean {
         return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
-    public List<String> getMethodParameterNamesByAsm4(final Method method) {
+    /**
+     * 获取方法参数名,兼容@RequestParam value=null的情况
+     *
+     * @param method
+     * @return
+     */
+    private List<String> getMethodParameterNamesByAsm4(final Method method) {
         final Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes == null || parameterTypes.length == 0) {
             return null;
@@ -282,7 +306,7 @@ public class YamlServiceBean {
                 }
             }, 0);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("get Method ParameterNames ByAsm4 error", e);
         }
         return parameterNames;
     }

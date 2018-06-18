@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping(value = "/renewal3")
 public class OpenApiServiceTermController5 {
 
-    @RequestMapping(path = "/queryServiceTermmmmm/{serviceCode}", method = RequestMethod.GET)
+    @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.GET)
     public OpenApiResult<ServiceTermResult> query(@PathVariable("serviceCode") String serviceCode, String hello) {
         return null;
     }
