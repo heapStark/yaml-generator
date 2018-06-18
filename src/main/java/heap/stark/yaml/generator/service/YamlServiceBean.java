@@ -1,21 +1,21 @@
 package heap.stark.yaml.generator.service;
 
 import heap.stark.yaml.generator.config.Config;
+import org.objectweb.asm.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 
 public class YamlServiceBean {
+    private static final Logger LOGGER = LoggerFactory.getLogger(YamlServiceBean.class);
     private Class c;
     private BufferedWriter bufferedWriter;
     private List<Class> classList;
@@ -43,6 +43,8 @@ public class YamlServiceBean {
         //根据方法写入信息
         Method[] methods = c.getDeclaredMethods();
         for (Method method : methods) {
+            List<String> paramNames = getMethodParameterNamesByAsm4(method);
+            LOGGER.info("paramNames for method {},:{}", method.getName(), paramNames);
             writeMethod(method);
         }
         writePathParams();
@@ -75,18 +77,18 @@ public class YamlServiceBean {
      */
     public void writeMethod(Method method) throws Exception {
         RequestMapping requestMapping = (RequestMapping) method.getAnnotation(RequestMapping.class);
-        String message = requestMapping.value()[0];
+        String message = requestMapping.path()[0];
         writeNewLine("  \"" + message + "\":");
         RequestMethod requestMethod = requestMapping.method()[0];
         if (requestMethod.equals(RequestMethod.GET)) {
             writeNewLine("    get:");
-        } else if (requestMethod.equals(RequestMethod.POST)){
+        } else if (requestMethod.equals(RequestMethod.POST)) {
             writeNewLine("    post:");
-        } else if (requestMethod.equals(RequestMethod.DELETE)){
+        } else if (requestMethod.equals(RequestMethod.DELETE)) {
             writeNewLine("    delete:");
-        }else if (requestMethod.equals(RequestMethod.PUT)){
+        } else if (requestMethod.equals(RequestMethod.PUT)) {
             writeNewLine("    put:");
-        }else if (requestMethod.equals(RequestMethod.PATCH)){
+        } else if (requestMethod.equals(RequestMethod.PATCH)) {
             writeNewLine("    patch:");
         }
         //todo operationId命名规则
@@ -102,7 +104,8 @@ public class YamlServiceBean {
         writeNewLine(message);
         //写入请求参数
         Parameter[] parameters = method.getParameters();
-        writeParams(parameters);
+        List<String> parameterNames = getMethodParameterNamesByAsm4(method);
+        writeParams(parameters, parameterNames);
 
 
         writeNewLine("      responses:");
@@ -111,8 +114,8 @@ public class YamlServiceBean {
         writeNewLine("          schema:");
         writeNewLine("            properties:");
         writeNewLine("              result:");
-        Type result = method.getGenericReturnType();
-        Type type = ((ParameterizedType) result).getActualTypeArguments()[0];
+        java.lang.reflect.Type result = method.getGenericReturnType();
+        java.lang.reflect.Type type = ((ParameterizedType) result).getActualTypeArguments()[0];
 
         //返回结果的泛型参数
         String name = type.getTypeName();
@@ -171,7 +174,8 @@ public class YamlServiceBean {
         }
     }
 
-    public void writeParams(Parameter[] parameters) throws Exception {
+    public void writeParams(Parameter[] parameters, List<String> names) throws Exception {
+        LOGGER.info("parameters:{}", parameters);
         if (parameters == null || parameters.length == 0) {
             return;
         } else {
@@ -184,18 +188,20 @@ public class YamlServiceBean {
                     break;
                 }
             }
+            Iterator<String> iterator = names.iterator();
             for (Parameter parameter : parameters) {
                 RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
                 RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
-                if (requestParam != null || requestBody != null) {
-                    writeParam(parameter);
+                {
+                    writeParam(parameter, iterator.next());
                 }
             }
         }
     }
 
-    public void writeParam(Parameter parameter) throws Exception {
+    public void writeParam(Parameter parameter, String string) throws Exception {
         RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
+        RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
         if (requestParam != null) {
             String name = requestParam.value();
             boolean required = requestParam.required();
@@ -211,9 +217,7 @@ public class YamlServiceBean {
                 writeNewLine("          type: " + toLow(parameter.getType().getSimpleName()));
                 writeNewLine("          required: " + required);
             }
-        }
-        RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
-        if (requestBody != null) {
+        } else if (requestBody != null) {
             classList.add(Class.forName(parameter.getType().getName()));
             String name = parameter.getType().getSimpleName();
             String nameLow = toLow(name);
@@ -221,6 +225,11 @@ public class YamlServiceBean {
             writeNewLine("          in: body");
             writeNewLine("          schema:");
             writeNewLine("            $ref: " + "\"../model/" + name + ".yaml#/definitions/" + nameLow + "\"");
+        } else if (parameter.getAnnotations()==null ||parameter.getAnnotations().length==0){
+            writeNewLine("        - name: " + string);
+            writeNewLine("          in: query");
+            writeNewLine("          type: " + toLow(parameter.getType().getSimpleName()));
+            writeNewLine("          required: " + false);
         }
     }
 
@@ -233,5 +242,49 @@ public class YamlServiceBean {
         return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
+    public List<String> getMethodParameterNamesByAsm4(final Method method) {
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+        if (parameterTypes == null || parameterTypes.length == 0) {
+            return null;
+        }
+        final Type[] types = new Type[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            types[i] = Type.getType(parameterTypes[i]);
+        }
+        final List<String> parameterNames = new ArrayList<>();
+
+        String className = c.getName();
+        int lastDotIndex = className.lastIndexOf(".");
+        className = className.substring(lastDotIndex + 1) + ".class";
+        InputStream is = c.getResourceAsStream(className);
+        try {
+            ClassReader classReader = new ClassReader(is);
+            classReader.accept(new ClassVisitor(Opcodes.ASM4) {
+                @Override
+                public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+                    // 只处理指定的方法
+                    Type[] argumentTypes = Type.getArgumentTypes(desc);
+                    if (!method.getName().equals(name) || !Arrays.equals(argumentTypes, types)) {
+                        return null;
+                    }
+                    return new MethodVisitor(Opcodes.ASM4) {
+                        @Override
+                        public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+                            // 静态方法第一个参数就是方法的参数，如果是实例方法，第一个参数是this
+                            if (Modifier.isStatic(method.getModifiers())) {
+                                parameterNames.add(name);
+                            } else if (index > 0) {
+                                parameterNames.add(name);
+                            }
+                        }
+                    };
+
+                }
+            }, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return parameterNames;
+    }
 
 }

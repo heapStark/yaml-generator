@@ -16,8 +16,8 @@ import java.util.Map;
 @RequestMapping(value = "/renewal3")
 public class OpenApiServiceTermController5 {
 
-    @RequestMapping(path = "/queryServiceTerm/{serviceCode}", method = RequestMethod.GET)
-    public OpenApiResult<ServiceTermResult> query(@PathVariable("serviceCode") String serviceCode) {
+    @RequestMapping(path = "/queryServiceTermmmmm/{serviceCode}", method = RequestMethod.GET)
+    public OpenApiResult<ServiceTermResult> query(@PathVariable("serviceCode") String serviceCode, String hello) {
         return null;
     }
 
@@ -40,7 +40,8 @@ public class OpenApiServiceTermController5 {
                                                       @RequestParam(value = "pageSize") Integer pageSize,
                                                       @RequestHeader(value = "x-jcloud-pin") String pin,
                                                       @RequestHeader(value = "x-jcloud-erp", required = false) String erp,
-                                                      @RequestBody() ServiceTerm serviceTerm
+                                                      @RequestBody() ServiceTerm serviceTerm,
+                                                      String hello
     ) {
         return null;
     }
@@ -64,7 +65,6 @@ public class OpenApiServiceTermController5 {
     public OpenApiResult<ServiceTerm> test(@PathVariable("serviceCode") String serviceCode) {
         return null;
     }
-
 
 
 }

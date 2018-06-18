@@ -104,7 +104,7 @@ public class ServiceClassBuilder {
                 JarEntry jarEntry = entrys.nextElement();
                 String entryName = jarEntry.getName();
                 if (entryName.endsWith(".class")) {
-                    LOGGER.info("entryName----------------------:{}",entryName);
+                    //LOGGER.info("entryName----------------------:{}",entryName);
                     if (entryName.startsWith(packagePath)) {
                         entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
                         try {
