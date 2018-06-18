@@ -28,10 +28,11 @@ public class YamlGenerator extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Config config = new Config(controllerPackage, resultPath, moduleName);
-            config.initByProperties();
+            //config.initByProperties();
             LOGGER.info("config :{}", config);
             YamlUtils.genYaml(config);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }

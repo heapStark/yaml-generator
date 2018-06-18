@@ -75,7 +75,7 @@ public class YamlServiceBean {
      */
     public void writeMethod(Method method) throws Exception {
         RequestMapping requestMapping = (RequestMapping) method.getAnnotation(RequestMapping.class);
-        String message = requestMapping.path()[0];
+        String message = requestMapping.value()[0];
         writeNewLine("  \"" + message + "\":");
         RequestMethod requestMethod = requestMapping.method()[0];
         if (requestMethod.equals(RequestMethod.GET)) {

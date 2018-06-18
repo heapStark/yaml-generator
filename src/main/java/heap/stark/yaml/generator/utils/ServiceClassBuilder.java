@@ -72,6 +72,7 @@ public class ServiceClassBuilder {
                         if (c.isAnnotationPresent(RestController.class)) {
                             Controller_CLASS_SET.add(Class.forName(childFilePath));
                         }
+                        Controller_CLASS_SET.add(Class.forName(childFilePath));
 
                     } catch (ClassNotFoundException e) {
                         LOGGER.error("exception when scan package", e);
@@ -89,6 +90,7 @@ public class ServiceClassBuilder {
      * @return 类的完整名称
      */
     private void getClassNameByJar(String jarPath) {
+        LOGGER.info("------------------------------japath:{}",jarPath);
         String[] jarInfo = jarPath.split("!");
         String jarFilePath = jarInfo[0].substring(S.equals("\\") ? 1 : 0).replace("/", S);
         if (jarFilePath.startsWith("file")) {
@@ -102,7 +104,7 @@ public class ServiceClassBuilder {
                 JarEntry jarEntry = entrys.nextElement();
                 String entryName = jarEntry.getName();
                 if (entryName.endsWith(".class")) {
-
+                    LOGGER.info("entryName----------------------:{}",entryName);
                     if (entryName.startsWith(packagePath)) {
                         entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
                         try {
@@ -110,6 +112,7 @@ public class ServiceClassBuilder {
                             if (c.isAnnotationPresent(RestController.class)){
                                 Controller_CLASS_SET.add(Class.forName(entryName));
                             }
+                            Controller_CLASS_SET.add(Class.forName(entryName));
                         } catch (ClassNotFoundException e) {
                             LOGGER.error("exception when scan package", e);
                         }
@@ -130,6 +133,7 @@ public class ServiceClassBuilder {
      * @return 类的完整名称
      */
     private void getClassNameByJars(URL[] urls, String packagePath) {
+        LOGGER.info("-----------:{}",urls);
         if (urls != null) {
             for (int i = 0; i < urls.length; i++) {
                 URL url = urls[i];
