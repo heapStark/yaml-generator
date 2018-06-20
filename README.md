@@ -14,8 +14,11 @@
 [示例代码](https://github.com/heapStark/yaml-generator-demo)
 ##
 步骤
-1.  mvn install -Pdev
+1.  mvn package install -Papi-package
 2.  mvn install -Papi-****
+## 更新说明
+当前已经支持不需要显示添加@RequestParam注解
+由于大部分工程打包方式为war包,pom文件在需要显示指定
 ## todoList & problem
 不支持在yaml文档中输出注释
 解决方案1：定义注释注解,这种方案对代码侵入太高
